@@ -1,0 +1,101 @@
+= Installation
+
+== The speed Way 
+
+Get it from GemCutter
+
+if you are not GemGutter
+
+  $ sudo bash
+  # gem ins gemcutter
+  # gem tumble
+
+Install UG_RRobots
+
+  # gem ins UG_RRobots
+
+That's all folk !
+
+== Download
+
+UG_RRobots could be download from the URL :
+
+http://www.ultragreen.net/projects/rrobots/files
+
+You could choose the Gem file or the TGZ fiile if you want to modify the project before to install it.
+Files are sort by release
+ 
+== Gem or Package creation
+
+*Info* : this step is mandatory only if you choose to download TGZ sources
+
+Exemple version 2.2 :
+
+  $  wget http://www.ultragreen.net/attachments/download/51/UG_RRobots-2.2.tgz
+  $ tar xvzf G_RRobots-2.2.tgz
+  $ cd UG_RRobots-2.2/
+  $ rake clean
+  $ rake clobber
+  $ rake gem 
+  $ rake package # pour refaire le tgz 
+
+Gemfile or TGZ source are under the pkg Folder
+
+If you create your gem, please do :
+
+  $ cd pkg
+
+otherwise
+
+  $ wget http://www.ultragreen.net/attachments/download/52/UG_RRobots-2.2.gem
+
+== Gem Installation 
+
+You should be root
+
+  $ sudo bash
+  # gem install UG_RRobots-2.2.gem
+
+deinstallation :
+
+  $ sudo bash
+  # gem uninstall UG_RRobots
+
+== Configuration
+
+=== Config File Format
+
+YAML file : rrobots.yaml
+
+  battlefield: 
+   width: 800
+   height: 800
+  bullets: 
+   speed: 30
+  filename: rrobots.yml
+  game: 
+   timeout: 50000
+  mines: 
+   with_mines: false
+   bullet_energy_resistance: 2
+   energy_hit_points: 20
+  robots: 
+   nb_mines: 3
+   radar_mine_scanning_performance: 500
+   energy_max: 100
+  toolboxes: 
+   energy_heal_points: 20
+   life_time: 200
+   with_toolboxes: false
+   spawning_chances: 100
+
+
+=== Config file reading order and priority
+
+in this order
+
+* Code builtin values
+* GEM_PATH/config/rrobots.yml (merge)
+* PATH ('.') unless you have the -ignore-config for the rrobots command
+
+the -argument -write-config create a clone of the configuration in PATH ('.') also named rrobots.yml 

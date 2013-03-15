@@ -1,0 +1,22 @@
+--- !ruby/object:Configuration 
+battlefield: 
+  :width: 800
+  :height: 800
+bullets: 
+  :speed: 30
+filename: rrobots.yml
+game: 
+  :timeout: 50000
+mines: 
+  :with_mines: false
+  :bullet_energy_resistance: 2
+  :energy_hit_points: 20
+robots: 
+  :nb_mines: 3
+  :radar_mine_scanning_performance: 500
+  :energy_max: 100
+toolboxes: 
+  :energy_heal_points: 20
+  :life_time: 200
+  :with_toolboxes: false
+  :spawning_chances: 100

@@ -1,0 +1,67 @@
+=== rrobots
+
+  USAGE: rrobots [resolution] [#match] [-nogui] [-speed=<N>] [-timeout=<N>] [-teams=<N>] [-with-toolboxes] [-with-mines] [-set-locale=<locale>] [-set-gui-engine=<engine>]
+                 <FirstRobotClassName[.rb]> <SecondRobotClassName[.rb]> <...>
+    ou : rrobots [-set-locale=<locale>] -list-internals
+    ou : rrobots [-set-locale=<locale>] -list-locales
+	ou : rrobots [-set-locale=<locale>] -list-gui-engines
+	ou : rrobots [-set-locale=<locale>] -manual 
+	ou : rrobots [-set-locale=<locale>]
+	
+Sans arguments : donne cette page d'usage de la commande
+
+
+* [-list-internals] (exclusif) donne la liste des robots disponible en interne.
+* [resolution] (optionel) de la forme 640x480 ou 800x600. (defaut 800x800).
+* [match] (optionel) pour rejouer un match, nommage du format #nombre, enregistre ou rejoue un match.  
+* [-nogui] (optionel) execute le match sans GUI, pour maximiser la vitesse.(ignores l'argument speed si il est présent).
+* [-speed=<N>] (optionel, défaut to 1) maj de la GUI après N ticks. Plus N est grand plus le match est rapide.
+* [-timeout=<N>] (optionel, défaut 50000) nombre de tick max d'un match.
+* [-teams=<N>] (optionel) découpe en N équipes. le match s'arrête quand il ne reste plus qu'un robots ou en timeout.
+* [-with-toolboxes] (optionel) pour accepter l'apparition de boite à outils (aleatoire).
+* [-ignore-config] (optionel) pour ignorer la lecture de la configuration dans le fichier YAML du path.
+* [-write-config] (optionel) pour écrire un dump de la configuration dans le fichier YAML du path.
+* [-set-locale] (optionel) force une locale.
+* [-list-locales] (exclusif) liste les locales disponibles.
+* [-manual] (exclusif) donne la page de manuel du projet RRobots
+* [-with-mines] (optionel) accepte le dépôt de mines parl les robots (default 3).
+* [-set-gui-engine] (optionel) force un moteur GUI si il existe dans la liste des moteurs disponibles.
+* [-list-gui-engines] (exclusive) liste moteurs  GUI disponibles.
+
+
+Remarques :
+* le fichier d'un robot doit avoir le même nom que la Classe du Robot
+* (jusqu'à 8 robots)
+
+Exemple :
+
+  $ rrobots SittingDuck NervousDuck'
+
+ou 
+
+  $ rrobots 600x600 #1234567890 SittingDuck NervousDuck'
+
+
+=== tournament
+
+  USAGE : tournament [-timeout=<N>] [-matches=<N>] [-with-toolboxes] [-with-mines] [-set-locale=<locale>] 
+                     (-dir=<Directory> | <RobotClassName[.rb]>+)
+	 ou : tournament [-set-locale=<locale>] -list-locales
+	 ou : tournament [-set-locale=<locale>] -manual
+	 ou : tournament [-set-locale=<locale>]
+	
+Sans arguments : donne cette page d'usage de la commande 
+
+* [-timeout=<N>] (optionel, defaut 10000) nombre de tick max d'un match.
+* [-matches=<N>] (optionel, defaut 2) nombre de face à face par couple de 2 robots.
+* -dir=<Directory> tout les fichiers .rb de ce répertoire s'affronte par match réciproque.
+* [-ignore-config] (optionel) pour ignorer la lecture de la configuration dans le fichier YAML du path.
+* [-with-toolboxes] (optionel) active le mode d'apparition de boites à outils. 
+* [-set-locale] (optionel) force un locale.
+* [-list-locales] (exclusif) liste les locales disponibles.
+* [-manual] (exclusif) donne la page de manuel du projet RRobots.
+* [-list-internals] (exclusif) donne la liste des robots disponible en interne.
+* [-with-mines] (optionel) accepte le dépôt de mines parl les robots (default 3).
+
+Ce mode n'a pas besoin de TK ni de GOSU
+

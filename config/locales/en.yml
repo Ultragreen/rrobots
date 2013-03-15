@@ -1,0 +1,19 @@
+---
+en:
+    rrobots:
+        list_internals_title: List of avaibles internals robots
+        list_locales_title: List of avaibles locales
+        list_gui_engines_title: List of avaibles GUI Engines        
+        match_limit_warning: match ends if only 1 bot/team left or dots get here-->|
+        gui_engine_not_found: The GUI Engine you have requested not exist
+    battlefield:
+        robot_made_an_exception: '{{robot}} made an exception'
+    gui:
+        ai_name_dead: '{{ai_name}} dead'
+        draw: "Draw!"
+        no_team_wonn: ' won!'        
+        no_team_won: '{{winner_name}} won!'
+        team_won: 'Team {{winner_team}} won!'
+        game_over: GAME OVER
+
+        

@@ -1,0 +1,59 @@
+=== rrobots
+
+  USAGE: rrobots [resolution] [#match] [-nogui] [-speed=<N>] [-timeout=<N>] [-teams=<N>] [-with-toolboxes] [-with-mines] [-set-locale=<locale>] [-set-gui-engine=<engine>]
+                 <FirstRobotClassName[.rb]> <SecondRobotClassName[.rb]> <...>
+    or : rrobots [-set-locale=<locale>] -list-internals
+    or : rrobots [-set-locale=<locale>] -list-locales
+	or : rrobots [-set-locale=<locale>] -manual 
+	or : rrobots [-set-locale=<locale>] -list-gui-engines
+	or : rrobots [-set-locale=<locale>]
+
+without arguments : give this usage page
+
+* [-list-internals] (exclusive) give the list of avaibles internals Robots.
+* [resolution] (optional) should be of the form 640x480 or 800*600. default is 800x800.
+* [match] (optional) to replay a match, put the match# here, including the #sign.  
+* [-nogui] (optional) run the match without the gui, for highest possible speed.(ignores speed value if present).
+* [-speed=<N>] (optional, defaults to 1) updates GUI after every N ticks.  The higher the N, the faster the match will play.
+* [-timeout=<N>] (optional, default 50000) number of ticks a match will last at most.
+* [-teams=<N>] (optional) split robots into N teams. Match ends when only one team has robots left.
+* [-with-toolboxes] (optional) to accept the spawning of healing toolboxes (randomly).
+* [-ignore-config] (optional) to ignore the config file present in the path.
+* [-write-config] (optional) to write the config in a file in the path.
+* [-set-locale] (optional) force a locale if avaible in locales list.
+* [-list-locales] (exclusive) list avaible locale.
+* [-manual] (exclusive) give the manual page of RRobots.
+* [-with-mines] (optional) to accept the dropping of mines by the robots (default 3).
+* [-set-gui-engine] (optional) force a GUI engine if avaible in engines list.
+* [-list-gui-engines] (exclusive) list avaibles gui Engines.
+
+
+
+The names of the rb files have to match the class names of the robots
+(up to 8 robots)
+
+e.g. 'rrobots SittingDuck NervousDuck'
+  or 'rrobots 600x600 #1234567890 SittingDuck NervousDuck'
+
+=== tournament
+
+  USAGE : tournament [-timeout=<N>] [-matches=<N>] [-with-toolboxes] [-with-mines] [-set-locale=<locale>] 
+                   (-dir=<Directory> | <RobotClassName[.rb]>+)
+	 or : tournament [-set-locale=<locale>] -list-locales
+	 or : tournament [-set-locale=<locale>] -manual
+	 or : tournament [-set-locale=<locale>]
+	
+without arguments : give this usage page
+	
+* [-timeout=<N>] (optional, default 10000) number of ticks a match will last at most.
+* [-matches=<N>] (optional, default 2) how many times each robot fights every other robot.
+* -dir=<Directory> All .rb files from that directory will be matched against each other.
+* [-ignore-config] (optional) to ignore the config file YAML present in the path.
+* [-with-toolboxes] (optional) to accept the spawning of healing toolboxes (randomly).
+* [-set-locale] (optional) force a locale if avaible in locales list.
+* [-list-locales] (exclusive) list available locales.
+* [-manual] (exclusive) donne la page de manuel du projet RRobots.
+* [-list-internals] (exclusive) give the list of avaibles internals Robots.
+* [-with-mines] (optional) to accept the dropping of mines by the robots (default 3).
+
+This mode doesn't need TK or GOSU engine

@@ -1,0 +1,6 @@
+UG RRobots
+Fork du projet RRobots
+(c) Simon Kröger
+Ruby license (http://www.ruby-lang.org/en/LICENSE.txt).
+Co-author Fork (c) Romain GEORGES 
+

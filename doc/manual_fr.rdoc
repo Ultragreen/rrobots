@@ -1,0 +1,107 @@
+= UG RRobots Fork
+
+== Copyrights :
+
+UG RRobots
+Fork du projet RRobots
+RRobots Core (c) Simon Kröger
+  => Ruby license (http://www.ruby-lang.org/en/LICENSE.txt).
+Co-autheur Fork (c) Romain GEORGES
+GOSU Engine (c) Albert Ramstedt
+
+== Version 
+
+- UG RRobots  Fork v1.0
+- fork of RRobots v0.2.2
+
+Au début il y avait CRobots (Version C), suivit par PRobots (Pascal) et beaucoup d'autres, récemment (quelques années quand même) Robocode à fait son apparition (version Java) et maintenant il y a RRobots qui apporte le fun à la communauté Ruby
+Cette Variante du programme initilale de Simon Kröger, http://rubyforge.org/projects/rrobots, apporte de nouvelles fonctionnalitées
+ 
+== De quoi parle-t-on ? 
+
+UG RRobots est une simulation de champs de bataille pour Robots Virtuels
+Chaque Robots possède un Radar et un Canon
+Les robots peuvent bouger vers l'avant et l'arrière et son entièrement contrôlés par des scripts en Ruby
+Tous les robots ont les même caractéristiques, et tant que le joueur n'a pas codé son Intelligence le robot est un objet inerte.
+
+== Un exemple de script rudimentaire 
+
+=== il pourrait ressembler à ceci :
+
+<code class="ruby">
+require 'robot'
+class NervousDuck
+   include Robot
+  def tick events
+    turn_radar 1 if time == 0
+    turn_gun 30 if time < 3
+    accelerate 1
+    turn 2
+    fire 3 unless events['robot_scanned'].empty? 
+  end
+end
+</code>
+
+*Précaution* : le fichier d'un robot doit avoir le même nom que la Classe du Robot (son nom), par exemple ici NervousDuck.rb
+
+== API RRobots 
+
+La seule méthode à implémenter au minimum pour animer votre robot est la méthode *tick* qui a pour paramètre *events*, un hachage des événements qui sont survenus pendant le dernier 'tick'.
+Un tick est une opération atomique pour tout les éléments du jeu.
+ 
+En incluant le module Ruby Robot vous récupérez les méthodes indispensable pour piloter votre robot :
+
+- *battlefield_height* : la longueur du champ de bataille 
+- *battlefield_width* : la largeur du champ de bataille
+- *energy* : la quantité d'énergie restante (si elle tombe à 0 votre robot meure )
+- *gun_heading* : l'orientation de votre canon, EST : 0 / NORD : 90 / OUEST : 180 / SUD : 270)
+- *gun_heat* : l'indicateur de surchauffe du canon, quand il re-descent à 0, vous pouvez tirer de nouveau
+- *heading* : l'orientation de votre robot, EST : 0 / NORD : 90 / OUEST : 180 / SUD : 270)
+- *size* : le rayon de votre robot, si x <= size vous heurtez le mur gauche
+- *radar_heading* : l'orientation de votre radar, EST : 0 / NORD : 90 / OUEST : 180 / SUD : 270)     
+- *time* : le nombre de 'tick' depuis le début du round.
+- *speed* : votre vitesse (-8/8)
+- *x* : votre abscisse X, dans l'intervalle 0...battlefield_width
+- *y* :  votre ordonné Y, dans l'intervalle 0...battlefield_height
+- *accelerate*(_param_) : définit l'accélération  (la vitesse max est  -8/8, l'acceleration max est 1/-1, une vitesse négative signifie reculer
+- *stop* : réduit votre vitesse à 0, l'opération prend 1 ticks par point de vitesse, positif ou négatif
+- *fire*(_power_) : lance un boulet de canon dans le sens de votre canon, la puissance va de 0,1 à 3 (plus la puissance est grande plus le temps de surchauffe est grand)
+- *turn*(_degrés_)* : tourne votre robot et donc votre canon et votre radar (max 10 degrés par tick)       
+- *turn_gun*(_degres_) : tourne votre canon et donc votre radar (max 30 degrés par tick)  
+- *turn_radar*(_degres_) : tourne votre radar (max 60 degrés par tick) 
+- *dead* : renvoie vrai si vous êtes mort
+- *drop_mine* : pose une mine sous le robot (une mine ne peut pas abimer le robot qui l'a posée)
+
+* *say*(_msg_) : affiche un message sur l'écran en mode GUI/TK au dessus de votre robot.
+* *broadcast*(_msg_) : envoie un message à tous les robots sur le champs de bataille, une clef '*broadcast*' est ajouté au hachage '*events*' avec le message et la direction
+- *team_broadcast*(_msg_) envoie un message à tous les robots de votre equipe sur le champs de bataille, une clef '*team_broadcast*' est ajouté au hachage '*events*' avec le message et la direction 
+
+Cette liste de méthode est volontairement réduite et basique, à la charge du joueur créer ses propres méthodes de haut niveau grace à la puissance de Ruby.
+(exemple : move_to, fire_at, etc...)
+
+=== Quelques mots d'explication :
+
+- Le canon est monté sur le corps du robot, donc si vous bougez le robot le canon suit.
+Pareil pour le radar, qui se trouve sur le canon.
+
+- Le radar scan tout se qui trouve sur le rayon de déplacement cumulé du robot, du canon et du radar lui même (mouvement relatif du radar) sur un '*tick*' donné, mais ne renvoi que la distance vers le/les objets scannés (clef *robot_scanned* avec la distance en valeur pour les robots, clef toolbox_scanned avec la distance en valeur pour les boites à outils, clef *mine_scanned*) ceci fait donc un angles d'incertitude maximum de 100°, pour pouvoir être précis il faut bouger votre radar plus doucement.
+
+- UG RRobots Fork introduit les boites à outils, elle sont donc détectables par le radar, lorsqu'un robot passe sur l'une d'elle, il récupère des points d'energie (20 par défaut).
+Les boites à outils apparaissent de façon aléatoire et reste pour une durée définie ( 200 ticks par défaut), chaque tick elle ont la même chance (faible) d'apparaître (1 sur 100 par défaut)
+Les mines déposables peuvent être détecté par les autres robots si il sont suffisamment près d'elle, et dans l'axe du radar (défaut 500 px)
+Les mines sont destructible par l'abus du canon d'un robot de force > (par défaut 2).
+
+UG RRobots Fork, comme la version d'origine, est implémenté en Ruby pur avec une Interface Graphique TK et peut tourner sur de nombreuses plateformes qui possèdent Ruby et TK, le moteur du jeu en lui même peu très bien se passer de TK.
+UG RRobots Fork à été testé sur Windows, la plus part des distributions Linux, FreeBSD et Windows
+
+UG RRobots supporte le moteur GUI GOSU
+Ce moteur fournit une meilleur qualité de rendu, du son et même de la musique.
+
+
+== Utilisation des commandes
+
+:include:usage_fr.rdoc
+
+- le fichier d'un robot doit avoir le même nom que la Classe du Robot
+- les robots s'affrontes un contre un
+- les resultats son disponible au formats YAML et HTML

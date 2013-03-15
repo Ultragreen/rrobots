@@ -1,0 +1,331 @@
+#!/usr/bin/env ruby
+#== Synopsis
+#
+# rrobots : AI Ruby Scripts based Robots simulation game
+#
+#== Date
+#
+#  2009-11-27
+#
+#== Copyright 
+#
+# 
+# Ultragreen (c) 2005-2008 : Romain GEORGES UG RRobots
+# Fork du projet RRobots
+# Historical (c) Simon Kröger
+# Ruby license (http://www.ruby-lang.org/en/LICENSE.txt).
+#
+#* Version : 2.0
+#
+#== About :
+# 
+#* Author:: Simon Kröger, Romain GEORGES 
+#* type:: robots AI Game (need TK)  
+#* obj:: command
+# 
+#== Source :
+# 
+#* http://www.ultragreen.net/projects/rrobots
+# 
+
+require 'I18n'
+
+require 'rdoc/usage'
+require 'misc'
+require 'robot'
+require 'yaml'
+require 'overloads'
+require 'configuration'
+require 'battlefield'
+
+
+init_I18n get_locale_from_env
+@locales = I18n.backend.available_locales
+
+##############################################
+# arena
+##############################################
+
+def usage
+  usage_file = "usage.rdoc"
+  usage_file = "usage_#{I18n.locale}.rdoc" if I18n.locale != 'en'
+  doc = "#{gem_path('doc')}/#{usage_file}"
+  RDoc.file_no_exit(doc,"rrobots")
+  exit
+end
+
+def run_out_of_gui(battlefield)
+  $stderr.puts I18n.t('rrobots.match_limit_warning')
+  
+
+  until battlefield.game_over
+    battlefield.tick
+    $stderr.print "." if battlefield.time % (battlefield.timeout / 54).to_i == 0
+  end
+  print_outcome(battlefield)
+  exit 0
+end
+
+def run_in_gui(battlefield, xres, yres, speed_multiplier)
+  require "GUI/#{@engine}"
+  load_gui(battlefield, xres, yres, speed_multiplier)
+end
+
+
+
+def print_outcome(battlefield)
+  winners = battlefield.robots.find_all{|robot| !robot.dead}
+  puts
+  if battlefield.robots.size > battlefield.teams.size
+    teams = battlefield.teams.find_all{|name,team| !team.all?{|robot| robot.dead} }
+    puts "winner_is:     { #{
+      teams.map do |name,team|
+        "Team #{name}: [#{team.join(', ')}]"
+      end.join(', ')
+    } }"
+    puts "winner_energy: { #{
+      teams.map do |name,team|
+        "Team #{name}: [#{team.map do |w| ('%.1f' % w.energy) end.join(', ')}]"
+      end.join(', ')
+    } }"
+  else
+    puts "winner_is:     [#{winners.map{|w|w.name}.join(', ')}]"
+    puts "winner_energy: [#{winners.map{|w|'%.1f' % w.energy}.join(', ')}]"
+  end
+  puts "elapsed_ticks: #{battlefield.time}"
+  puts "seed :         #{battlefield.seed}"
+  puts
+  puts "robots :"
+  battlefield.robots.each do |robot|
+    puts "  #{robot.name}:"
+    puts "    damage_given:       #{'%.1f' % robot.damage_given}"
+    if battlefield.with_toolboxes
+      puts "    damage_taken:       #{'%.1f' % (100 + (robot.catched_toolboxes*20) - robot.energy)}" 
+    else
+      puts "    damage_taken:       #{'%.1f' % (100 - robot.energy)}"
+    end
+    puts "    kills:              #{robot.kills}"
+    puts "    toolboxes catched:  #{robot.catched_toolboxes}" if battlefield.with_toolboxes
+    puts "    dropped mines:      #{robot.dropped_mines}" if battlefield.with_mines
+    puts "    trigged mines:      #{robot.trigged_mines}" if battlefield.with_mines
+    puts "    destroyed mines:    #{robot.destroyed_mines}" if battlefield.with_mines
+  end
+end
+
+
+def array_gui_engines
+  my_res = Array::new
+  engines_path = gem_path('lib')
+  Dir["#{engines_path}/GUI/*.rb"].each  {|file| 
+    engine = File.basename(file, ".rb")
+    my_res.push engine
+  }
+  return my_res
+end
+
+def hash_internals
+  my_res = Hash::new
+  robots_path = gem_path('contribs/robots')
+  Dir["#{robots_path}/*.rb"].each  {|file| 
+    robots = File.basename(file, ".rb")
+    my_res[robots] = file
+  }
+  return my_res
+end
+
+def list_internals
+  title = I18n.t('rrobots.list_internals_title')
+  puts title
+  puts "-"*title.size
+  hash_internals.each do |key,value|
+    puts " - #{key}"
+  end
+end
+
+def list_gui_engines
+  title = I18n.t('rrobots.list_gui_engines_title')
+  puts title
+  puts "-"*title.size
+  array_gui_engines.each do |value|
+    puts " - #{value}"
+  end
+end
+
+def list_locales
+  title = I18n.t('rrobots.list_locales_title')
+  puts title
+  puts "-"*title.size
+  @locales.each do |value|
+    puts " - #{value}"
+  end
+end
+
+$stdout.sync = true
+
+@engine = 'tk'
+ARGV.grep( /^-set-gui-engine=(\w+)/ ) do |item|
+  x = $1.to_s
+  if array_gui_engines.include?(x) then
+    @engine=x
+  else
+    puts I18n.t('rrobots.gui_engine_not_found') 
+  end
+  ARGV.delete(item)
+end
+
+
+ARGV.grep( /^-set-locale=(\w{2})/ ) do |item|
+  x = $1.to_s
+  if @locales.include?(x) then
+    I18n.locale=x
+  else
+    I18n.locale='en'
+  end
+  ARGV.delete(item)
+end
+
+# look for query for robots internal list
+ARGV.grep(/^(-list-internals)/) do |item|
+  list_internals 
+  exit 0
+end
+
+# look for query for robots internal list
+ARGV.grep(/^(-list-gui-engines)/) do |item|
+  list_gui_engines
+  exit 0
+end
+
+
+# look for query for robots internal list
+ARGV.grep(/^(-manual)/) do |item|
+  manual_file = "manual.rdoc"
+  manual_file = "manual_#{I18n.locale}.rdoc" if I18n.locale != 'en'
+  doc = "#{gem_path('doc')}/#{manual_file}"
+  RDoc.file_no_exit(doc)
+  exit 0
+end
+
+# look for query for locales avaible list
+ARGV.grep(/^(-list-locales)/) do |item|
+  list_locales   
+  exit 0
+end
+
+# look for resolution arg
+xres, yres = 800, 800
+ARGV.grep(/^(\d+)[x\*](\d+$)/) do |item|
+  xres, yres = $1.to_i, $2.to_i
+  ARGV.delete(item)
+end
+
+# look for match arg
+seed = Time.now.to_i + Process.pid
+ARGV.grep(/^#(\d+)/) do |item|
+  seed = $1.to_i
+  ARGV.delete(item)
+end
+
+#look for with_toolboxes arg
+with_toolboxes = false
+ARGV.grep( /^(-with-toolboxes)/ ) do |item|
+with_toolboxes = true 
+  ARGV.delete(item)
+end
+
+#look for with_toolboxes arg
+with_mines = false
+ARGV.grep( /^(-with-mines)/ ) do |item|
+with_mines = true 
+  ARGV.delete(item)
+end
+
+#look for mode arg
+mode = :run_in_gui
+ARGV.grep( /^(-nogui)/ )do |item|
+  mode = :run_out_of_gui
+  ARGV.delete(item)
+end
+
+#look for config arg
+merge = true
+ARGV.grep( /^(-ignore-config)/ )do |item|
+  merge = false
+  ARGV.delete(item)
+end
+
+#look for config write arg
+write_config = false
+ARGV.grep( /^(-write-config)/ )do |item|
+  write_config = true
+  ARGV.delete(item)
+end
+
+#look for speed multiplier arg
+speed_multiplier = 1
+ARGV.grep( /^-speed=(\d\d?)/ )do |item|
+  x = $1.to_i
+  speed_multiplier = x if x > 0 && x < 100
+  ARGV.delete(item)
+end
+
+
+#look for timeout arg
+timeout = 50000
+ARGV.grep( /^-timeout=(\d+)/ )do |item|
+  timeout = $1.to_i
+  ARGV.delete(item)
+end
+
+
+
+#look for teams arg
+team_count = 8
+ARGV.grep( /^-teams=(\d)/ )do |item|
+  x = $1.to_i
+  team_count = x if x > 0 && x < 8
+  ARGV.delete(item)
+end
+teams = Array.new([team_count, ARGV.size].min){ [] }
+
+usage if ARGV.size > 8 || ARGV.empty?
+
+battlefield = Battlefield.new xres*2, yres*2, timeout, seed, with_toolboxes, with_mines, merge, write_config
+
+c = 0
+team_divider = (ARGV.size / teams.size.to_f).ceil
+
+
+ARGV.map! do |robot|
+  begin
+    begin
+      require robot.downcase
+    rescue LoadError
+    end
+    begin
+      require robot
+    rescue LoadError
+    end
+    begin 
+      require hash_internals[robot]
+    rescue LoadError
+  end
+  in_game_name = File.basename(robot).sub(/\..*$/, '')
+  in_game_name[0] = in_game_name[0,1].upcase
+  team = c / team_divider
+  c += 1
+  robotrunner = RobotRunner.new(Object.const_get(in_game_name).new, battlefield, team)
+  battlefield << robotrunner
+  rescue Exception => error
+    puts 'Error loading ' + robot + '!'
+    warn error
+    usage
+  end
+  in_game_name
+end
+
+if mode == :run_out_of_gui
+  run_out_of_gui(battlefield)
+else
+  run_in_gui(battlefield, xres, yres, speed_multiplier)
+end
