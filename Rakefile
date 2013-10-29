@@ -2,8 +2,8 @@ require 'rubygems'
 
 require 'rake'
 require "rake/clean"
-require "rake/gempackagetask"
-require "rake/rdoctask"
+require 'rubygems/package_task'
+require "rdoc/task"
 
 
 
@@ -29,11 +29,13 @@ spec = Gem::Specification.new do |s|
   s.rdoc_options << '--title' << 'UG RRobots a RRobots project Fork ' << '--main' << 'doc/manual.rdoc' << '--line-numbers' << '--exclude' << 'contribs robots medias' << '--diagram' 
 end
 
- 
-Rake::GemPackageTask.new(spec) do |pkg| 
-  pkg.need_tar = true 
-end
 
+
+Gem::PackageTask.new(spec) do |pkg|
+  pkg.need_tar = true
+  pkg.need_zip = true
+end
+ 
 Rake::RDocTask.new('rdoc') do |d|
   d.rdoc_files.include('doc/**/*','lib/**/*.rb','bin/*')
   d.main = 'doc/manual.rdoc'
@@ -44,7 +46,7 @@ end
 task :default => [:gem]
 
 task 'stats' do
-  require 'tools/scriptlines'
+  require './tools/scriptlines'
 
   files = FileList['lib/**/*.rb'].concat(FileList["bin/*"].to_a)
   

@@ -33,7 +33,7 @@ class ScriptLines
       when /^=begin(\s|$)/
         in_multiline_comment = true
         @comment_lines += 1
-      when /^=end(\s|$)/:
+      when /^=end(\s|$)/
         @comment_lines += 1
         in_multiline_comment = false
       when /^\s*#/

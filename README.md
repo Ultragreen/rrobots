@@ -1,6 +1,6 @@
-# UG RRobots Fork
+= UG RRobots Fork
 
-## Copyrights :
+== Copyrights :
 
 UG RRobots
 Fork of RRobots project
@@ -9,27 +9,27 @@ RRobots Core (c) Simon Kröger
 Co-author Fork (c) Romain GEORGES
 GOSU Engine (c) Albert Ramstedt
 
-## Version 
+== Version 
 
 - UG RRobots  Fork v1.0
 - fork of RRobots v0.2.2
 
-## Presentation
+== Presentation
 
 First there was CRobots, followed by PRobots and many others, recently
 (well also years ago) Robocode emerged and finally this is RRobots bringing
 all the fun to the ruby community.
 
-## What is he talking about?
+== What is he talking about?
 
 RRobots is a simulation environment for robots, these robots have a scanner
 and a gun, can move forward and backwards and are entirely controlled by
 ruby scripts. All robots are equal (well at the moment, maybe this will 
 change) except for the ai.
 
-## A simple robot script
+== A simple robot script
 
-```ruby
+<code>
 require 'robot'
 class NervousDuck
   include Robot
@@ -41,14 +41,14 @@ class NervousDuck
     fire 3 unless events['robot_scanned'].empty? 
   end
 end
-```
+</code>
 
 
 all you need to implement is the tick method which should accept a hash
 of events occured turing the last tick.
 
 
-## API RRobots Fork
+== API RRobots Fork
 
 By including Robot you get all this methods to controll your bot:
 
@@ -100,9 +100,9 @@ and several linux distributions)
 RRobots support an other GUI engine, GOSU
 This engine offer best displays, musics and sounds
 
-## Usage
+== Usage
 
-see in doc/usage.rdoc
+:include:usage.rdoc
 
 the names of the rb files have to match the class names of the robots.
 Each robot is matched against each other 1on1. The results are available 
